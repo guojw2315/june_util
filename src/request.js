@@ -1,0 +1,113 @@
+import axios from 'axios'
+import { getToken, setToken, getRefreshToken, getTokenState, setTokenState, getPosId } from './auth'
+
+// 刷新 access_token 的接口
+const refreshToken = (instance, path = '/refresh/token') => {
+    return instance.post(path + `?refreshToken=${getRefreshToken()}`, { refreshToken: getRefreshToken() }, true)
+}
+
+// 给请求头添加 access_token
+const setHeaderToken = (instance, isNeedToken, options = {}) => {
+    const refreshToken = isNeedToken ? getRefreshToken() : null
+    const accessToken = isNeedToken ? getToken() : null
+
+    if (isNeedToken) { // api 请求需要携带 access_token
+        tokenLose = getTokenState()
+        if (!refreshToken && !tokenLose) {
+            console.log('不存在 access_token 则跳转回登录页')
+            setTokenState(true)
+            options.onTokenLose && options.onTokenLose()
+        }
+        instance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+        options.setHeaders && options.setHeaders(instance)
+    }
+}
+
+export const setPosHeaders = (instance, key = 'x-shj-request-dept_pos_id') => {
+    instance.defaults.headers.common[key] = getPosId()
+}
+
+
+export default function create(config = {}, options = {}) {
+    // 创建 axios 实例
+    const instance = axios.create({
+        // baseURL: process.env.GATSBY_API_URL,
+        // baseURL: '/api',
+        timeout: 30000,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        ...config
+    })
+
+    let isRefreshing = false // 标记是否正在刷新 token
+    let requests = [] // 存储待重发请求的数组
+
+    instance.interceptors.response.use(response => {
+        return response
+    }, error => {
+        if (!error.response) {
+            return Promise.reject(error)
+        }
+        if (error.response.status === 417 && !error.config.url.includes('/auth/refresh')) {
+            const { config } = error
+            if (!isRefreshing) {
+                isRefreshing = true
+                return refreshToken(instance, options.refreshTokenPath).then(res => {
+                    const { access_token } = res.data
+                    setToken(access_token)
+                    config.headers.Authorization = `Bearer ${access_token}`
+                    // token 刷新后将数组的方法重新执行
+                    requests.forEach((cb) => cb(access_token))
+                    requests = [] // 重新请求完清空
+                    return instance(config)
+                }).catch(err => {
+                    console.log('抱歉，您的登录状态已失效，请重新登录！')
+                    options.onTokenLose && options.onTokenLose()
+                    return Promise.reject(err)
+                }).finally(() => {
+                    isRefreshing = false
+                })
+            } else {
+                // 返回未执行 resolve 的 Promise
+                return new Promise(resolve => {
+                    // 用函数形式将 resolve 存入，等待刷新后再执行
+                    requests.push(token => {
+                        config.headers.Authorization = `Bearer ${token}`
+                        resolve(instance(config))
+                    })
+                })
+            }
+        }
+        return Promise.reject(error)
+    })
+
+
+    // 有些 api 并不需要用户授权使用，则无需携带 access_token；默认不携带，需要传则设置第三个参数为 true
+    const get = (url, params = {}, isNeedToken = false) => {
+        setHeaderToken(instance, isNeedToken, options)
+        return instance({
+            method: 'get',
+            url,
+            params,
+        })
+    }
+
+    const post = (url, params = {}, isNeedToken = false) => {
+        setHeaderToken(instance, isNeedToken, options)
+        return instance({
+            method: 'post',
+            url,
+            data: params,
+        })
+    }
+
+    return {
+        instance,
+        get,
+        post,
+        refreshToken: (path) => refreshToken(instance, path || options.refreshTokenPath),
+    }
+}
+
+
