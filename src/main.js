@@ -21,3 +21,5 @@ const JuneUtil = {
     if (window.$jutil) return
     window.$jutil = JuneUtil
 }(window))
+
+export default JuneUtil

@@ -8,7 +8,8 @@ module.exports = {
         path: path.resolve(__dirname, './dist'),
         // publicPath: '/dist/',
         filename: process.env.NODE_ENV === 'development' ? 'jutil.js' : 'jutil.min.js',
-        libraryTarget: 'umd'
+        libraryTarget: 'umd',
+        libraryExport: 'default',
     },
     devtool: 'source-map',
     module: {   
