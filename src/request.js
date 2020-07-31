@@ -12,7 +12,7 @@ const setHeaderToken = (instance, isNeedToken, options = {}) => {
     const accessToken = isNeedToken ? getToken() : null
 
     if (isNeedToken) { // api 请求需要携带 access_token
-        tokenLose = getTokenState()
+        let tokenLose = getTokenState()
         if (!refreshToken && !tokenLose) {
             console.log('不存在 access_token 则跳转回登录页')
             setTokenState(true)
