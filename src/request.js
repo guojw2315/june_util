@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getToken, setToken, getRefreshToken, getTokenState, setTokenState, getPosId } from './auth'
+import { getToken, setToken, getRefreshToken, getTokenState, setTokenState, getPosId, setRefreshToken } from './auth'
 
 // 刷新 access_token 的接口
 const refreshToken = (instance, path = '/refresh/token') => {
@@ -49,13 +49,15 @@ export default function create(config = {}, options = {}) {
         if (!error.response) {
             return Promise.reject(error)
         }
-        if (error.response.status === 417 && !error.config.url.includes('/auth/refresh')) {
+        if (/^417$|^401$/g.test(error.response.status) && !error.config.url.includes('/auth/refresh')) {
             const { config } = error
             if (!isRefreshing) {
                 isRefreshing = true
                 return refreshToken(instance, options.refreshTokenPath).then(res => {
-                    const { access_token } = res.data
+                    const access_token = res.data[options.tokenKey || 'data']
+                    const refresh_token = res.headers[options.refreshTokenKey || 'refresh_token']
                     setToken(access_token)
+                    setRefreshToken(refresh_token)
                     config.headers.Authorization = `Bearer ${access_token}`
                     // token 刷新后将数组的方法重新执行
                     requests.forEach((cb) => cb(access_token))
