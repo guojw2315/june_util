@@ -98,8 +98,7 @@ export default function create(config = {}, options = {}) {
     const post = (url, {
         data = {},
         params = {},
-        isNeedToken = false
-    }) => {
+    }, isNeedToken = false) => {
         setHeaderToken(instance, isNeedToken, options)
         return instance({
             method: 'post',
