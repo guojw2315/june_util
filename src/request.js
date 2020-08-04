@@ -80,7 +80,10 @@ export default function create(config = {}, options = {}) {
                     })
                 })
             }
+        } else {
+            options.onError && options.onError(error)
         }
+       
         return Promise.reject(error)
     })
 
