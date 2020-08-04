@@ -95,12 +95,17 @@ export default function create(config = {}, options = {}) {
         })
     }
 
-    const post = (url, params = {}, isNeedToken = false) => {
+    const post = (url, {
+        data = {},
+        params = {},
+        isNeedToken = false
+    }) => {
         setHeaderToken(instance, isNeedToken, options)
         return instance({
             method: 'post',
             url,
-            data: params,
+            params: params,
+            data: data,
         })
     }
 
@@ -108,6 +113,7 @@ export default function create(config = {}, options = {}) {
         instance,
         get,
         post,
+        setHeaderToken: () => setHeaderToken(instance, true, options),
         refreshToken: (path) => refreshToken(instance, path || options.refreshTokenPath),
     }
 }
