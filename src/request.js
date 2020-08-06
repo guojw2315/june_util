@@ -2,8 +2,14 @@ import axios from 'axios'
 import { getToken, setToken, getRefreshToken, getTokenState, setTokenState, getPosId, setRefreshToken } from './auth'
 
 // 刷新 access_token 的接口
-const refreshToken = (instance, path = '/refresh/token') => {
-    return instance.post(path + `?refreshToken=${getRefreshToken()}`, { refreshToken: getRefreshToken() }, true)
+const refreshToken = (instance, path = '/refresh/token', baseURL) => {
+    return instance.post(path + `?refreshToken=${getRefreshToken()}`, { refreshToken: getRefreshToken() }, { baseURL })
+    // return instance.request({
+    //     baseURL,
+    //     url: path + `?refreshToken=${getRefreshToken()}`,
+    //     method: 'post',
+    //     data: { refreshToken: getRefreshToken() }
+    // })
 }
 
 // 给请求头添加 access_token
@@ -53,23 +59,24 @@ export default function create(config = {}, options = {}) {
             const { config } = error
             if (!isRefreshing) {
                 isRefreshing = true
-                return refreshToken(instance, options.refreshTokenPath).then(res => {
-                    const access_token = res.data[options.tokenKey || 'data']
-                    const refresh_token = res.headers[options.refreshTokenKey || 'refresh_token']
-                    setToken(access_token)
-                    setRefreshToken(refresh_token)
-                    config.headers.Authorization = `Bearer ${access_token}`
-                    // token 刷新后将数组的方法重新执行
-                    requests.forEach((cb) => cb(access_token))
-                    requests = [] // 重新请求完清空
-                    return instance(config)
-                }).catch(err => {
-                    console.log('抱歉，您的登录状态已失效，请重新登录！')
-                    options.onTokenLose && options.onTokenLose()
-                    return Promise.reject(err)
-                }).finally(() => {
-                    isRefreshing = false
-                })
+                return refreshToken(instance, options.refreshTokenPath, options.refreshURL || config.baseURL)
+                    .then(res => {
+                        const access_token = res.data[options.tokenKey || 'data']
+                        const refresh_token = res.headers[options.refreshTokenKey || 'refresh_token']
+                        setToken(access_token)
+                        setRefreshToken(refresh_token)
+                        config.headers.Authorization = `Bearer ${access_token}`
+                        // token 刷新后将数组的方法重新执行
+                        requests.forEach((cb) => cb(access_token))
+                        requests = [] // 重新请求完清空
+                        return instance(config)
+                    }).catch(err => {
+                        console.log('抱歉，您的登录状态已失效，请重新登录！')
+                        options.onTokenLose && options.onTokenLose()
+                        return Promise.reject(err)
+                    }).finally(() => {
+                        isRefreshing = false
+                    })
             } else {
                 // 返回未执行 resolve 的 Promise
                 return new Promise(resolve => {
@@ -81,9 +88,9 @@ export default function create(config = {}, options = {}) {
                 })
             }
         } else {
-            options.onError && options.onError(error)
+            options.onError && options.onError(error.response)
         }
-       
+
         return Promise.reject(error)
     })
 
@@ -116,7 +123,7 @@ export default function create(config = {}, options = {}) {
         get,
         post,
         setHeaderToken: () => setHeaderToken(instance, true, options),
-        refreshToken: (path) => refreshToken(instance, path || options.refreshTokenPath),
+        refreshToken: (path) => refreshToken(instance, path || options.refreshTokenPath, options.refreshURL || config.baseURL),
     }
 }
 
