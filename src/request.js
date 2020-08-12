@@ -131,7 +131,7 @@ export default function create(config = {}, options = {}) {
         })
     }
 
-    const deleteMethods = (url, {
+    const deleteReq = (url, {
         data = {},
         params = {},
     }, isNeedToken = false) => {
@@ -149,7 +149,7 @@ export default function create(config = {}, options = {}) {
         get,
         post,
         put,
-        delete: deleteMethods,
+        deleteReq,
         setHeaderToken: () => setHeaderToken(instance, true, options),
         refreshToken: (path) => refreshToken(instance, path || options.refreshTokenPath, options.refreshURL || config.baseURL),
     }
