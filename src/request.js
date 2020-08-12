@@ -118,10 +118,38 @@ export default function create(config = {}, options = {}) {
         })
     }
 
+    const put = (url, {
+        data = {},
+        params = {},
+    }, isNeedToken = false) => {
+        setHeaderToken(instance, isNeedToken, options)
+        return instance({
+            method: 'put',
+            url,
+            params: params,
+            data: data,
+        })
+    }
+
+    const deleteMethods = (url, {
+        data = {},
+        params = {},
+    }, isNeedToken = false) => {
+        setHeaderToken(instance, isNeedToken, options)
+        return instance({
+            method: 'delete',
+            url,
+            params: params,
+            data: data,
+        })
+    }
+
     return {
         instance,
         get,
         post,
+        put,
+        delete: deleteMethods,
         setHeaderToken: () => setHeaderToken(instance, true, options),
         refreshToken: (path) => refreshToken(instance, path || options.refreshTokenPath, options.refreshURL || config.baseURL),
     }
