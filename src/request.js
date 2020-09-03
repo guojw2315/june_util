@@ -29,10 +29,9 @@ const setHeaderToken = (instance, isNeedToken, options = {}) => {
     }
 }
 
-export const setPosHeaders = (instance, key = 'x-shj-request-dept_pos_id') => {
+export const setPosHeaders = (instance, key = 'x-shj-request-dept-pos-id') => {
     instance.defaults.headers.common[key] = getPosId()
 }
-
 
 export default function create(config = {}, options = {}) {
     // 创建 axios 实例
