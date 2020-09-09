@@ -95,18 +95,20 @@ export default function create(config = {}, options = {}) {
 
 
     // 有些 api 并不需要用户授权使用，则无需携带 access_token；默认不携带，需要传则设置第三个参数为 true
-    const get = (url, params = {}, isNeedToken = false) => {
+    const get = (url, params = {}, isNeedToken = false, headers = {}) => {
         setHeaderToken(instance, isNeedToken, options)
         return instance({
             method: 'get',
             url,
             params,
+            headers: { ...instance.defaults.headers, ...headers },
         })
     }
 
     const post = (url, {
         data = {},
         params = {},
+        headers = {},
     }, isNeedToken = false) => {
         setHeaderToken(instance, isNeedToken, options)
         return instance({
@@ -114,12 +116,14 @@ export default function create(config = {}, options = {}) {
             url,
             params: params,
             data: data,
+            headers: { ...instance.defaults.headers, ...headers },
         })
     }
 
     const put = (url, {
         data = {},
         params = {},
+        headers = {},
     }, isNeedToken = false) => {
         setHeaderToken(instance, isNeedToken, options)
         return instance({
@@ -127,12 +131,14 @@ export default function create(config = {}, options = {}) {
             url,
             params: params,
             data: data,
+            headers: { ...instance.defaults.headers, ...headers },
         })
     }
 
     const deleteReq = (url, {
         data = {},
         params = {},
+        headers = {},
     }, isNeedToken = false) => {
         setHeaderToken(instance, isNeedToken, options)
         return instance({
@@ -140,6 +146,7 @@ export default function create(config = {}, options = {}) {
             url,
             params: params,
             data: data,
+            headers: { ...instance.defaults.headers, ...headers },
         })
     }
 
