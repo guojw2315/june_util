@@ -31,3 +31,9 @@ export const setTokenState = (flag = false) => {
 export const getTokenState = () => {
     return tokenLose
 }
+
+export const clear = () =>{
+    Cookies.remove(TOKEN_KEY)
+    Cookies.remove(REGRESH_TOKEN_KEY)
+    Cookies.remove(POS_ID_KEY)
+}

@@ -1,7 +1,7 @@
 import createRequest, { setPosHeaders } from './request'
 import { dfs, bfs } from './search'
 import common from './common'
-import { getToken, setToken, getRefreshToken, setRefreshToken, getPosId, setPosId } from './auth'
+import { getToken, setToken, getRefreshToken, setRefreshToken, getPosId, setPosId, clear } from './auth'
 const JuneUtil = {
     ...common,
     createRequest,
@@ -12,6 +12,7 @@ const JuneUtil = {
     getPosId,
     setPosId,
     setPosHeaders,
+    clear,
     
     dfs,
     bfs,
