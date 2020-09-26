@@ -1,13 +1,26 @@
 {
-  "name": "june-utils",
+  "name": "june-util",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "unpkg": "dist/june-ui.min.js",
+  "files": [
+    "dist",
+    "es",
+    "lib"
+  ],
+  "description": "公用工具库",
   "license": "MIT",
   "scripts": {
     "build:dev": "cross-env NODE_ENV=development webpack --mode=development",
-    "build": "webpack --mode=production"
+    "build": "webpack --mode=production",
+    "build:commonjs": "rimraf lib && cross-env BABEL_ENV=commonjs babel src -d lib --source-maps",
+    "build:es": "rimraf es && cross-env BABEL_ENV=es babel src -d es --source-maps",
+    "build:all": "yarn build && yarn build:commonjs && yarn build:es"
   },
+  "author": "guojunwei <junewill2019@qq.com> (https://github.com/june2315)",
   "dependencies": {
+    "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
     "axios": "^0.19.2",
     "js-cookie": "^2.2.1"
   },
