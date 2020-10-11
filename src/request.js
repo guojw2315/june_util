@@ -49,7 +49,7 @@ export default function create(config = {}, options = {}) {
     let requests = [] // 存储待重发请求的数组
 
     instance.interceptors.response.use(response => {
-        return response
+        return typeof options.onResponse === 'function' ? options.onResponse(response) : response
     }, error => {
         if (!error.response) {
             return Promise.reject(error)

@@ -78,7 +78,7 @@ export default function create(config, options) {
   var requests = []; // 存储待重发请求的数组
 
   instance.interceptors.response.use(function (response) {
-    return response;
+    return typeof options.onResponse === 'function' ? options.onResponse(response) : response;
   }, function (error) {
     if (!error.response) {
       return Promise.reject(error);

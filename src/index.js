@@ -27,9 +27,9 @@ const JuneUtil = {
 };
 
 (function (window) {
-  if (window.$jutil) return;
+  if (!window || window.$jutil) return;
   window.$jutil = JuneUtil;
-})(window);
+})(this);
 
 export {
   common,

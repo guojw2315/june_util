@@ -24,9 +24,9 @@ var JuneUtil = _objectSpread(_objectSpread({}, common), {}, {
 });
 
 (function (window) {
-  if (window.$jutil) return;
+  if (!window || window.$jutil) return;
   window.$jutil = JuneUtil;
-})(window);
+})(this);
 
 export { common, createRequest, getToken, setToken, getRefreshToken, setRefreshToken, getPosId, setPosId, setPosHeaders, clear, dfs, bfs };
 export default JuneUtil;
