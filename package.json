@@ -21,7 +21,7 @@
   "author": "guojunwei <junewill2019@qq.com> (https://github.com/june2315)",
   "dependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.11.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "js-cookie": "^2.2.1"
   },
   "devDependencies": {
